@@ -47,7 +47,10 @@ def get_members():
 def get_member(id):
 	try:
 		cursor = mysql.connect().cursor(pymysql.cursors.DictCursor)
-		cursor.execute("SELECT attendance_id, attendance_time_in, event_name, event_start, event_end FROM attendance inner join events on attendance_event_id=event_id")
+		cursor.execute(
+			"SELECT attendance_id, attendance_time_in, event_name, event_start, event_end FROM attendance inner join events on attendance_event_id=event_id WHERE attendance_member_id=%s",
+			id
+		)
 		rows = cursor.fetchall()
 		resp = jsonify(rows)
 		resp.status_code = 200
