@@ -17,7 +17,7 @@ def get_events():
 		resp.status_code = 200
 		return resp
 	except Exception as e:
-		print(e)
+		return handleException(e)
 
 @app.route('/api/event/<id>')
 def get_event(id):
@@ -29,19 +29,19 @@ def get_event(id):
 		resp.status_code = 200
 		return resp
 	except Exception as e:
-		print(e)
+		return handleException(e)
 
 @app.route('/api/members')
 def get_members():
 	try:
 		cursor = mysql.connect().cursor(pymysql.cursors.DictCursor)
-		cursor.execute("SELECT * FROM members")
+		cursor.execute("SELECT * FROM members ORDER BY member_last_name")
 		rows = cursor.fetchall()
 		resp = jsonify(rows)
 		resp.status_code = 200
 		return resp
 	except Exception as e:
-		print(e)
+		return handleException(e)
 
 @app.route('/api/member/<id>')
 def get_member(id):
@@ -53,7 +53,7 @@ def get_member(id):
 		resp.status_code = 200
 		return resp
 	except Exception as e:
-		print(e)
+		return handleException(e)
 
 @app.route('/api/types')
 def get_types():
@@ -65,7 +65,7 @@ def get_types():
 		resp.status_code = 200
 		return resp
 	except Exception as e:
-		print(e)
+		return handleException(e)
 
 @app.route('/api/cache')
 def get_cache():
@@ -109,9 +109,9 @@ def add_event():
 			resp.status_code = 200
 			return resp
 		else:
-			return not_found
+			return not_found()
 	except Exception as e:
-		print(e)
+		return handleException(e)
 
 @app.route('/api/member', methods=['POST'])
 def add_member():
@@ -130,9 +130,9 @@ def add_member():
 			resp.status_code = 200
 			return resp
 		else:
-			return not_found
+			return not_found()
 	except Exception as e:
-		print(e)
+		return handleException(e)
 
 @app.route('/api/signin', methods=['POST'])
 def sign_in():
@@ -144,7 +144,7 @@ def sign_in():
 		_long = _json['long']
 		
 		if not (_code and _id and _lat and _long):
-			return not_found
+			return not_found("Missing input")
 		
 		eventId = cache.get(_code)
 		
@@ -185,18 +185,27 @@ def sign_in():
 		session[str(eventId)] = True
 		return goodResp("Successfully signed in")
 	except Exception as e:
-		print(e)
+		return handleException(e)
 
 def goodResp(message):
 	resp = jsonify(message)
 	resp.status_code = 200
 	return resp
 
+def handleException(e):
+	print(e)
+	resp = jsonify({
+		"status": 500,
+		"message": str(e)
+	})
+	resp.status_code = 500
+	return resp
+
 @app.errorhandler(404)
 def not_found(error=None):
 	message = {
 		'status': 404,
-		'message': 'Not Found: ' + request.url,
+		'message': 'Not Found: ' + request.url if error == None else error,
 	}
 	resp = jsonify(message)
 	resp.status_code = 404
