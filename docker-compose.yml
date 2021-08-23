@@ -1,18 +1,25 @@
 version: '3'
 
 services:
+  client:
+    container_name: fast-client
+    build: ./client
+    volumes:
+      - ./client:/app
+    depends_on: 
+      - server
   server:
     container_name: fast-server
-    build: .
+    build: ./server
     ports:
       - 5000:5000
-    depends_on:
-      - db
     environment: 
       - FLASK_APP=main.py
       - FLASK_ENV=development
     volumes: 
-      - ./src:/app
+      - ./server/src:/app
+    depends_on:
+      - db
   db:
     container_name: fast-db
     image: mysql
@@ -22,4 +29,4 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - ./fast.sql:/docker-entrypoint-initdb.d/fast.sql
+      - ./db/fast.sql:/docker-entrypoint-initdb.d/fast.sql
