@@ -1,7 +1,7 @@
 import csv
 import requests
 
-with open('roster.csv') as csv_file:
+with open('roster2.csv') as csv_file:
 	csv_reader = csv.reader(csv_file, delimiter=",")
 	for row in csv_reader:
 		data = {
