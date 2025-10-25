@@ -1,6 +1,7 @@
+import os
 import pymysql
 import geopy.distance
-from app import app
+from app import app, port
 from db_config import mysql
 from flask import jsonify
 from flask import flash, request, session
@@ -216,11 +217,12 @@ def not_found(error=None):
 
 @app.after_request
 def add_header(resp):
-	resp.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+	origin = port = os.environ.get('HOST', 'http://localhost:3000')
+	resp.headers.add('Access-Control-Allow-Origin', "https://2c25-2600-1006-b160-5c4-153c-eacc-d9f9-54ab.ngrok.io")
 	resp.headers.add('Access-Control-Allow-Credentials', 'true')
 	resp.headers.add('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT')
 	resp.headers.add('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers')
 	return resp
 
 if __name__ == "__main__":
-	app.run()
+	app.run(host='0.0.0.0', port=port)

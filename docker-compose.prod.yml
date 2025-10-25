@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  web:
+    image: flask-test
+    environment:
+     - CLEARDB_DATABASE_URL=mysql://root:password@db/fast
+    ports: 
+      - 5000:5000
+    depends_on:
+      - db
+  db:
+    container_name: fast-db
+    image: mysql
+    environment: 
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=fast
+    ports:
+      - 3306:3306
+    volumes:
+      - ./db/fast.sql:/docker-entrypoint-initdb.d/fast.sql
